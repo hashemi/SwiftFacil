@@ -8,13 +8,22 @@
 import CFacil
 
 func on_request(_ request: UnsafeMutablePointer<http_s>?) {
-    var cstr = "txt".utf8CString
-    _ = cstr.withUnsafeMutableBufferPointer { pointer in
-        http_set_header(request, HTTP_HEADER_CONTENT_TYPE,
-                        http_mimetype_find(pointer.baseAddress, 3))
+    var data = Array<UInt8>("txt".utf8)
+    _ = data.withUnsafeMutableBufferPointer { buf in
+        http_set_header(
+            request,
+            HTTP_HEADER_CONTENT_TYPE,
+            http_mimetype_find(buf.baseAddress, buf.count)
+        )
     }
-    cstr = "Hello, world!".utf8CString
-    _ = cstr.withUnsafeMutableBufferPointer { pointer in http_send_body(request, pointer.baseAddress, 13)
+
+    var data2 = Array<UInt8>("Hello, world!".utf8)
+    _ = data2.withUnsafeMutableBufferPointer { buf in
+        http_send_body(
+            request,
+            buf.baseAddress,
+            UInt(buf.count)
+        )
     }
 }
 
